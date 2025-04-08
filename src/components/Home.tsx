@@ -1,46 +1,32 @@
 import React from 'react';
-import { Box, Typography, Grid, Paper } from '@mui/material';
 import ExpandableSection from './ExpandableSection';
 import ChartComponent from './ChartComponent';
 
 const Home: React.FC = () => {
   // Sample data for pie charts
-  const chartData1 = {
-    labels: ['Product A', 'Product B', 'Product C', 'Product D'],
-    values: [30, 25, 20, 25]
+  const sampleData1 = {
+    labels: ['Category A', 'Category B', 'Category C', 'Category D'],
+    values: [300, 200, 100, 50]
   };
 
-  const chartData2 = {
-    labels: ['Type X', 'Type Y', 'Type Z'],
-    values: [40, 35, 25]
+  const sampleData2 = {
+    labels: ['Product X', 'Product Y', 'Product Z'],
+    values: [400, 300, 200]
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" gutterBottom>
-        Dashboard Overview
-      </Typography>
+    <div className="home-container">
+      <h1 className="page-title">Dashboard Home</h1>
+      <p className="page-description">Welcome to the dashboard. Here are some sample charts:</p>
       
-      <ExpandableSection title="Analytics Charts">
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <ChartComponent title="Distribution by Product" data={chartData1} />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <ChartComponent title="Distribution by Type" data={chartData2} />
-          </Grid>
-        </Grid>
+      <ExpandableSection title="Chart Section 1">
+        <ChartComponent title="Sample Chart 1" data={sampleData1} />
       </ExpandableSection>
       
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Recent Activity
-        </Typography>
-        <Typography variant="body1">
-          This section would display recent activity or notifications.
-        </Typography>
-      </Paper>
-    </Box>
+      <ExpandableSection title="Chart Section 2">
+        <ChartComponent title="Sample Chart 2" data={sampleData2} />
+      </ExpandableSection>
+    </div>
   );
 };
 

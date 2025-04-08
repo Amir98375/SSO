@@ -106,7 +106,8 @@ const ChartComponent = ({ title, data }: { title: string, data: any }) => {
               outerRadius={80}
               paddingAngle={2}
               dataKey="value"
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              label={false}
+        
             >
               {chartData.map((entry: any, index: number) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
