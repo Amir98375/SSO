@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { AppNew } from './AppNew.tsx';
-import { CssBaseline } from '@mui/material';
+import { AppNew } from './AppNew';
+import './AppNew.css';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -9,7 +9,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <CssBaseline />
     <AppNew />
   </React.StrictMode>
 );

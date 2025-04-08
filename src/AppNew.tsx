@@ -1,24 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { 
-  ThemeProvider, 
-  createTheme, 
-  Button, 
-  CssBaseline, 
-  Typography, 
-  Box, 
-  AppBar, 
-  Toolbar, 
-  Container,
-  Paper,
-  Avatar,
-  IconButton,
-  Menu,
-  MenuItem,
-  Divider
-} from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { 
   isAuthenticated, 
   getUserInfo, 
   handleLoginSuccess, 
@@ -27,195 +9,248 @@ import {
   isSuperAdmin,
   checkForAuthCode
 } from './auth.tsx';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import Dashboard from './Dashboard';
+import './AppNew.css';
 
+// Custom expandable section component
+const ExpandableSection = ({ 
+  title, 
+  children 
+}: { 
+  title: string, 
+  children: React.ReactNode 
+}) => {
+  const [expanded, setExpanded] = useState<boolean>(true);
 
+  const toggleExpand = () => {
+    setExpanded(!expanded);
+  };
 
-// Simple placeholder components
-const Home = () => <div>Home Page</div>;
-const DBConfig = () => <div>DB Configuration Page</div>;
-
-const theme = createTheme();
-
-// Protected route component
-const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.ReactNode, requireAdmin?: boolean }) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/" replace />;
-  }
-  
-  if (requireAdmin && !isSuperAdmin()) {
-    return <Navigate to="/home" replace />;
-  }
-  
-  return <>{children}</>;
+  return (
+    <div className="expandable-section">
+      <div className="expandable-header" onClick={toggleExpand}>
+        <h2>{title}</h2>
+        <button className={`expand-button ${expanded ? 'expanded' : ''}`}>
+          ▼
+        </button>
+      </div>
+      <div className={`expandable-content ${expanded ? 'expanded' : ''}`}>
+        {children}
+      </div>
+    </div>
+  );
 };
 
-// Landing page with login form
-const LandingPage = () => {
-  // Check for authorization code in URL (after redirect)
+// Pie Chart Component with Recharts
+const ChartComponent = ({ title, data }: { title: string, data: any }) => {
+  const COLORS = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+    '#9966FF', '#FF9F40', '#C9CBCF'
+  ];
+
+  const chartData = data.labels.map((label: string, index: number) => ({
+    name: label,
+    value: data.values[index]
+  }));
+
+  const total = chartData.reduce((sum: number, item: any) => sum + item.value, 0);
+
+  // Custom tooltip component
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <div className="tooltip-item">
+            <span className="tooltip-name">{payload[0].name}</span>
+            <span className="tooltip-value">{payload[0].value}</span>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="chart-container">
+      <h2 className="chart-title">{title}</h2>
+      <div className="chart-content">
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80}
+              paddingAngle={2}
+              dataKey="value"
+              label={false}
+            >
+              {chartData.map((entry: any, index: number) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip 
+              content={<CustomTooltip />} 
+              position={{ x: 20, y: 0 }}
+              wrapperStyle={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+        
+        <div className="chart-total">
+          <span className="total-value">{total}</span>
+          <span className="total-label">Total</span>
+        </div>
+      </div>
+      
+      <div className="chart-legend">
+        {chartData.map((entry: any, index: number) => (
+          <div key={index} className="legend-item">
+            <span 
+              className="legend-color" 
+              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+            />
+            <span className="legend-text">
+              {entry.name}: {entry.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Home component with pie charts
+const Home = () => {
+  // Sample data for pie charts
+  const sampleData1 = {
+    labels: ['Category A', 'Category B', 'Category C', 'Category D'],
+    values: [300, 200, 100, 50]
+  };
+
+  const sampleData2 = {
+    labels: ['Product X', 'Product Y', 'Product Z'],
+    values: [400, 300, 200]
+  };
+
+  return (
+    <div className="home-container">
+      <h1 className="page-title">Dashboard Home</h1>
+      <p className="page-description">Welcome to the dashboard. Here are some sample charts:</p>
+      
+      <ExpandableSection title="Chart Section 1">
+        <ChartComponent title="Sample Chart 1" data={sampleData1} />
+      </ExpandableSection>
+      
+      <ExpandableSection title="Chart Section 2">
+        <ChartComponent title="Sample Chart 2" data={sampleData2} />
+      </ExpandableSection>
+    </div>
+  );
+};
+
+// Navigation component
+const Navigation = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  
+  // Mock user data instead of getting from auth
+  const userInfo = {
+    name: "Test User",
+    email: "test@example.com"
+  };
+
+  return (
+    <nav className="main-nav">
+      <div className="nav-content">
+        <Link to="/" className="nav-logo">Dashboard</Link>
+        
+        <div className="nav-links">
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/dashboard" className="nav-link">Dashboard</Link>
+          <Link to="/dbconfig" className="nav-link">DB Config</Link>
+        </div>
+
+        <div className="user-menu">
+          <button 
+            className="user-button"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <span className="user-icon">👤</span>
+            {userInfo?.name || 'User'}
+          </button>
+          
+          {menuOpen && (
+            <div className="user-dropdown">
+              <div className="user-info">
+                <span className="user-name">{userInfo?.name}</span>
+                <span className="user-email">{userInfo?.email}</span>
+              </div>
+              <button 
+                className="logout-button"
+                onClick={() => console.log('Logout clicked')}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+// Login component
+const Login = () => {
   useEffect(() => {
     checkForAuthCode();
   }, []);
 
-  const handleLogin = () => {
-    window.location.href = getLoginUrl();
-  };
-
   return (
-    <Container maxWidth="sm" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Paper elevation={3} sx={{ p: 4, width: '100%', textAlign: 'center' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Intel Dashboard
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Please login to access the dashboard
-        </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
-          size="large" 
-          onClick={handleLogin}
-          sx={{ width: '100%' }}
+    <div className="login-container">
+      <div className="login-box">
+        <h1>Welcome to Dashboard</h1>
+        <p>Please sign in to continue</p>
+        <button 
+          className="login-button"
+          onClick={() => window.location.href = getLoginUrl()}
         >
-          Login with SSO
-        </Button>
-      </Paper>
-    </Container>
+          Sign in with Azure AD
+        </button>
+      </div>
+    </div>
   );
 };
 
-// User profile menu component
-const UserProfileMenu = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const userInfo = getUserInfo();
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogoutClick = () => {
-    handleClose();
-    handleLogout();
-  };
-
+// Main App component
+const AppNew = () => {
+  // Bypass login by always returning true
+  const isLoggedIn = true;
+  
   return (
-    <>
-      <IconButton
-        onClick={handleClick}
-        size="small"
-        sx={{ ml: 2 }}
-        aria-controls={open ? 'account-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-      >
-        <Avatar sx={{ width: 32, height: 32 }}>
-          {userInfo?.name?.charAt(0) || <AccountCircleIcon />}
-        </Avatar>
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        id="account-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: 'visible',
-            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-            mt: 1.5,
-            '& .MuiAvatar-root': {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1,
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <Box sx={{ px: 2, py: 1 }}>
-          <Typography variant="subtitle1">{userInfo?.name}</Typography>
-          <Typography variant="body2" color="text.secondary">{userInfo?.username}</Typography>
-        </Box>
-        <Divider />
-        <MenuItem onClick={handleLogoutClick}>
-          Logout
-        </MenuItem>
-      </Menu>
-    </>
+    <BrowserRouter>
+      <div className="app">
+        {isLoggedIn ? (
+          <>
+            <Navigation />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                {isSuperAdmin() && (
+                  <Route path="/dbconfig" element={<div>DB Config Page</div>} />
+                )}
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </main>
+          </>
+        ) : (
+          <Login />
+        )}
+      </div>
+    </BrowserRouter>
   );
 };
 
-// Navigation bar component
-const Navigation = () => {
-  const isAdmin = isSuperAdmin();
-
-  return (
-    <AppBar position="static" color="default" elevation={1}>
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-          <Box component="img" src="/logo.png" alt="Intel Logo" sx={{ height: 30, mr: 1 }} />
-          Intel
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button color="inherit" component={Link} to="/home">
-            Home
-          </Button>
-          {!isAdmin && (
-            <Button color="inherit" component={Link} to="/db-config">
-              DB Configuration
-            </Button>
-          )}
-          <UserProfileMenu />
-        </Box>
-      </Toolbar>
-    </AppBar>
-  );
-};
-
-// Dashboard layout with navigation
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navigation />
-      <Container sx={{ mt: 4, flexGrow: 1 }}>
-        {children}
-      </Container>
-    </Box>
-  );
-};
-
-export const AppNew: React.FC = () => {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={
-            isAuthenticated() ? <Navigate to="/home" replace /> : <LandingPage />
-          } />
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Home />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-          <Route path="/db-config" element={
-            <ProtectedRoute requireAdmin={true}>
-              <DashboardLayout>
-                <DBConfig />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
-  );
-};
+export { AppNew };

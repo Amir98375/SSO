@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Grid, Paper } from '@mui/material';
-import ExpandableSection from './ExpandableSection';
-import ChartComponent from './ChartComponent';
+import ExpandableSection from './components/ExpandableSection';
+import ChartComponent from './components/ChartComponent';
 
 const Home: React.FC = () => {
   // Sample data for pie charts
@@ -45,4 +45,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
