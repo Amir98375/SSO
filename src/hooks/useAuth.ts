@@ -1,6 +1,6 @@
 import { useMsal } from "@azure/msal-react";
 import { useState, useEffect } from "react";
-import { graphConfig } from "../config/authConfig";
+import { authConfig } from "../config/authConfig";
 
 interface UserProfile {
     displayName: string;
@@ -22,20 +22,12 @@ export const useAuth = () => {
                         account: accounts[0]
                     });
 
-                    const graphResponse = await fetch(graphConfig.graphMeEndpoint, {
-                        headers: {
-                            Authorization: `Bearer ${response.accessToken}`
-                        }
-                    });
-
-                    const data = await graphResponse.json();
-                    
-                    // In a real application, you would typically get the role from your backend
-                    // or from Azure AD claims. For this example, we'll hardcode it.
+                    // In a real application, you would fetch from your backend
+                    // For this example, we'll use the mock data
                     setUserProfile({
-                        displayName: data.displayName,
-                        email: data.userPrincipalName,
-                        role: "super-admin" // This should come from your backend or Azure AD claims
+                        displayName: authConfig.mockUser.name,
+                        email: authConfig.mockUser.email,
+                        role: authConfig.mockUser.role
                     });
                 } catch (error) {
                     console.error("Error fetching user profile:", error);

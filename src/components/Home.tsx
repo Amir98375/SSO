@@ -1,6 +1,7 @@
 import React from 'react';
 import ExpandableSection from './ExpandableSection';
 import ChartComponent from './ChartComponent';
+import './Home.css';
 
 const Home: React.FC = () => {
   // Sample data for pie charts

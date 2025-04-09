@@ -1,28 +1,40 @@
 import React, { useState } from 'react';
+import './ExpandableSection.css';
 
 interface ExpandableSectionProps {
   title: string;
   children: React.ReactNode;
+  defaultExpanded?: boolean;
 }
 
-const ExpandableSection: React.FC<ExpandableSectionProps> = ({ title, children }) => {
-  const [expanded, setExpanded] = useState<boolean>(true);
+const ExpandableSection: React.FC<ExpandableSectionProps> = ({ 
+  title, 
+  children, 
+  defaultExpanded = true 
+}) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
-  const toggleExpand = () => {
-    setExpanded(!expanded);
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
   };
 
   return (
     <div className="expandable-section">
-      <div className="expandable-header" onClick={toggleExpand}>
+      <div 
+        className="section-header"
+        onClick={toggleExpansion}
+      >
         <h2>{title}</h2>
-        <button className={`expand-button ${expanded ? 'expanded' : ''}`}>
+        <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>
           ▼
-        </button>
+        </span>
       </div>
-      <div className={`expandable-content ${expanded ? 'expanded' : ''}`}>
-        {children}
-      </div>
+      
+      {isExpanded && (
+        <div className="section-content">
+          {children}
+        </div>
+      )}
     </div>
   );
 };

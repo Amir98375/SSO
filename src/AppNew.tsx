@@ -1,13 +1,14 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { isSuperAdmin } from './auth';
-import Dashboard from './Dashboard';
+import Dashboard from './components/Dashboard';
 import './AppNew.css';
 
 // Import components
 import Navigation from './components/Navigation';
 import Home from './components/Home';
 import Login from './components/Login';
+import { DBConfig } from './components/DBConfig';
 
 // Main App component
 const AppNew = () => {
@@ -25,7 +26,7 @@ const AppNew = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 {isSuperAdmin() && (
-                  <Route path="/dbconfig" element={<div>DB Config Page</div>} />
+                  <Route path="/db-config" element={<DBConfig />} />
                 )}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
